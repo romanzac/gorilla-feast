@@ -1,0 +1,50 @@
+version: '3.8'
+services:
+  gorilla-feast:
+    container_name: gorilla-feast
+    image: gorilla-feast:1.0.2
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - '4439:4439'
+    networks:
+      - gorilla-feast
+    environment:
+      GORILLA_FEAST_LISTEN: "gorilla-feast"
+      GORILLA_FEAST_PORT: "4439"
+      GORILLA_FEAST_DISABLETLS: "no"
+      GORILLA_FEAST_KEY: "/app/gorilla-feast-private.pem"
+      GORILLA_FEAST_CERT: "/app/gorilla-feast-public.crt"
+      GORILLA_FEAST_JWTPRIVKEY: "/app/gorilla-feast-jwt-private.pem"
+      GORILLA_FEAST_JWTPUBKEY: "/app/gorilla-feast-jwt-public.pem"
+      GORILLA_FEAST_POSTGRESURI: "postgres://gorilla_feast:123456@db:5432/gf_test"
+
+  db:
+    container_name: gorilla-feast-db
+    image: postgres:15.2
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=gorilla_feast
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=gf_test
+    ports:
+      - '5432:5432'
+    networks:
+      - gorilla-feast
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+      - ./scripts/init_pg.sh:/docker-entrypoint-initdb.d/init_pg.sh
+      - ./scripts/gf_postgres_schema.sql:/docker-entrypoint-initdb.d/gf_postgres_schema.sql
+      - ./scripts/gf_postgres_data.sql:/docker-entrypoint-initdb.d/gf_postgres_data.sql
+
+networks:
+  gorilla-feast:
+    driver: bridge
+
