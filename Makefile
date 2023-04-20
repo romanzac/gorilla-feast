@@ -17,7 +17,7 @@ start-db:
 	mkdir -p pgdata
 	ln -s $(shell pwd)/pgdata /tmp/pgdata
 	docker run --name postgr-gf -e POSTGRES_USER=gf_test -e POSTGRES_PASSWORD=123456 -e POSTGRES_DB=gf_test -p 5432:5432 -v "/tmp/pgdata:/var/lib/postgresql/data" -d postgres:15.1
-	sleep 15
+	sleep 25
 	cp scripts/gf_postgres_*.sql /tmp/pgdata
 	# Installing schema from gf_postgres_schema.sql...
 	docker exec -it postgr-gf bash -c "psql -U gf_test -h localhost -d gf_test -f /var/lib/postgresql/data/gf_postgres_schema.sql"
