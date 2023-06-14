@@ -3,7 +3,7 @@
 To clone the repository, use the following command:
 
 ```sh
-git clone https://github.com/romanzac/gorilla-feast
+git clone https://github.com/romanzac/gorilla-feast.git
 ```
 
 Run Gorilla Feast with docker-compose:
